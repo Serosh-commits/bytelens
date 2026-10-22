@@ -16,11 +16,11 @@ static void print_hex(const char* buffer, std::size_t bytes_read,std::size_t off
 
         std::cout<<" ";
         if (bytes_it != 0) {
-            std::cout << '  ';
+            std::cout << ' ';
         }
 
         if(bytes_it  == 8){
-            std::cout<<'  ';
+            std::cout<<' ';
         }
 
         std::cout << std::setw(2)
