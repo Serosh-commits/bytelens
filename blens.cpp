@@ -11,17 +11,33 @@ static void print_hex(const char* buffer, std::size_t bytes_read,std::size_t off
               << std::setfill('0')
               << offset
               << "  ";
-     for(std::size_t i = 0; i < bytes_read; ++i) {
-        const auto byte = static_cast<unsigned char>(buffer[i]);
-        if (i != 0) {
+     for(std::size_t bytes_it = 0; bytes_it < bytes_read; ++bytes_it) {
+        const auto byte = static_cast<unsigned char>(buffer[bytes_it]);
+        if (bytes_it != 0) {
             std::cout << ' ';
         }
         std::cout << std::setw(2)
                   << static_cast<unsigned int>(byte);
     }
-    std::cout << '\n';
 }
 
+static void print_ascii(const char* buffer, std::size_t byte_read){
+    
+    std::cout<< std::dec << " |";
+
+    for(std::size_t ascii_it = 0; ascii_it  < byte_read; ++ascii_it){
+        const char byte = static_cast<unsigned char>(buffer[ascii_it]);
+        
+        if(byte >= 32 && byte <= 126){
+            std::cout<<static_cast<char>(byte);
+        } else {
+            std::cout<<".";
+        }
+    }
+
+    std::cout<<"| \n";
+
+}
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         std::cerr << "<include file>\n";
@@ -44,6 +60,7 @@ int main(int argc, char* argv[]) {
         if (bytes_read > 0) {
             const auto count = static_cast<std::size_t>(bytes_read);
             print_hex(buffer, count, offset);
+            print_ascii(buffer, bytes_read);
             offset += count;
             total_bytes += count;
         }
