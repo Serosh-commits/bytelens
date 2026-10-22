@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
         if (bytes_read > 0) {
             const auto count = static_cast<std::size_t>(bytes_read);
             print_hex(buffer, count, offset);
-            print_ascii(buffer, bytes_read);
+            print_ascii(buffer, count);
             offset += count;
             total_bytes += count;
         }
@@ -86,15 +86,15 @@ int main(int argc, char* argv[]) {
             return EXIT_FAILURE;
         }
     }
-
-    if (!std::cout) {
-        std::cerr << "bytelens: error writing the  output\n";
-        return EXIT_FAILURE;
-    }
-
     std::cout << std::dec
               << "total bytes read : " << total_bytes << '\n';
 
+    std::cout.flush();
+
+    if(!std::cout){
+        std::cerr<<"bytelens : error waiting for output";
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }
 
