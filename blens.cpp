@@ -13,9 +13,16 @@ static void print_hex(const char* buffer, std::size_t bytes_read,std::size_t off
               << "  ";
      for(std::size_t bytes_it = 0; bytes_it < bytes_read; ++bytes_it) {
         const auto byte = static_cast<unsigned char>(buffer[bytes_it]);
+
+        std::cout<<" ";
         if (bytes_it != 0) {
-            std::cout << ' ';
+            std::cout << '  ';
         }
+
+        if(bytes_it  == 8){
+            std::cout<<'  ';
+        }
+
         std::cout << std::setw(2)
                   << static_cast<unsigned int>(byte);
     }
@@ -35,7 +42,7 @@ static void print_ascii(const char* buffer, std::size_t byte_read){
         }
     }
 
-    std::cout<<"| \n";
+    std::cout<<"|  \n";
 
 }
 int main(int argc, char* argv[]) {
