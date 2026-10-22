@@ -4,16 +4,17 @@
 #include <iomanip>
 #include <iostream>
 #include<array>
+#include<span>
 constexpr std::size_t buf_size = 16;
 
-static void print_hex(const char* buffer, std::size_t bytes_read,std::size_t offset) {
+static void print_hex(std::span<const char> bytes, std::size_t offset) {
     std::cout << std::hex
               << std::setw(8)
               << std::setfill('0')
               << offset
               << "  ";
-     for(std::size_t bytes_it = 0; bytes_it < bytes_read; ++bytes_it) {
-        const auto byte = static_cast<unsigned char>(buffer[bytes_it]);
+     for(std::size_t bytes_it = 0; bytes_it < bytes.size(); ++bytes_it) {
+        const auto byte = static_cast<unsigned char>(bytes[bytes_it]);
 
         std::cout<<" ";
         if (bytes_it != 0) {
@@ -29,12 +30,12 @@ static void print_hex(const char* buffer, std::size_t bytes_read,std::size_t off
     }
 }
 
-static void print_ascii(const char* buffer, std::size_t byte_read){
+static void print_ascii(std::span<const char>bytes){
     
     std::cout<< std::dec << " |";
 
-    for(std::size_t ascii_it = 0; ascii_it  < byte_read; ++ascii_it){
-        const char byte = static_cast<unsigned char>(buffer[ascii_it]);
+    for(std::size_t ascii_it = 0; ascii_it < bytes.size(); ++ascii_it){
+        const auto byte = static_cast<unsigned char>(bytes[ascii_it]);
         
         if(byte >= 32 && byte <= 126){
             std::cout<<static_cast<char>(byte);
@@ -67,8 +68,8 @@ int main(int argc, char* argv[]) {
         const std::streamsize bytes_read = file.gcount();
         if (bytes_read > 0) {
             const auto count = static_cast<std::size_t>(bytes_read);
-            print_hex(buffer.data(), count, offset);
-            print_ascii(buffer.data(), count);
+            print_hex(std::span<const char>(buffer.data(), count), offset);
+            print_ascii(std::span<const char>(buffer.data(), count));
             offset += count;
             total_bytes += count;
         }
