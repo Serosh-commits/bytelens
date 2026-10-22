@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include<array>
 constexpr std::size_t buf_size = 16;
 
 static void print_hex(const char* buffer, std::size_t bytes_read,std::size_t offset) {
@@ -58,16 +59,16 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    char buffer[buf_size];
+    std::array<char , buf_size> buffer{};
     std::size_t offset = 0;
     std::size_t total_bytes = 0;
     while (true) {
-        file.read(buffer, sizeof(buffer));
+        file.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
         const std::streamsize bytes_read = file.gcount();
         if (bytes_read > 0) {
             const auto count = static_cast<std::size_t>(bytes_read);
-            print_hex(buffer, count, offset);
-            print_ascii(buffer, count);
+            print_hex(buffer.data(), count, offset);
+            print_ascii(buffer.data(), count);
             offset += count;
             total_bytes += count;
         }
