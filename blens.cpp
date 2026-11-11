@@ -5,7 +5,40 @@
 #include <iostream>
 #include<array>
 #include<span>
+#include<vector>
+#include<string>
 constexpr std::size_t buf_size = 16;
+
+enum class colorwish{
+    unset,
+    on,
+    off
+};
+
+namespace color {
+
+    bool enabled = false;
+    constexpr const char* OFFSET = "\x1b[38;5;244m";
+    constexpr const char* HEX_LO = "\x1b[38;5;153m";
+    constexpr const char* HEX_HI = "\x1b[38;5;203m";
+    constexpr const char* HEX_NULL = "\x1b[38;5;238m";//dark green
+    constexpr const char* ASCII_PR = "\x1b[38;5;120m";
+    constexpr const char* ASCII_NP = "\x1b[38;5;238m";//dark greeen
+    constexpr const char* HEADER = "\x1b[1;37m";//bold white
+    constexpr const char* KEY = "\x1b[38;5;75m";
+    constexpr const char* VALUE = "\x1b[38;5;222m";
+    constexpr const char* MATCH = "\x1b[1;31m";
+    constexpr const char* STRING = "\x1b[38;5;120m";
+    constexpr const char* ENTROPY_LO = "\x1b[38;5;46m";  // bright green
+    constexpr const char* ENTROPY_MD = "\x1b[38;5;226m"; // yellow     
+    constexpr const char* ENTROPY_HI = "\x1b[38;5;196m"; // bright red 
+    constexpr const char* RESET     = "\x1b[0m";
+}
+
+
+const char* get(const char* code){
+    return color::enabled ? code : "";
+}
 
 static void print_hex(std::span<const char> bytes, std::size_t offset) {
     std::cout << std::hex
