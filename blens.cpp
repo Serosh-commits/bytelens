@@ -17,7 +17,7 @@ enum class colorwish{
 
 namespace color {
 
-    bool enabled = false;
+    bool enabled = true;
     constexpr const char* OFFSET = "\x1b[38;5;244m";
     constexpr const char* HEX_LO = "\x1b[38;5;153m";
     constexpr const char* HEX_HI = "\x1b[38;5;203m";
@@ -34,7 +34,7 @@ namespace color {
     constexpr const char* ENTROPY_HI = "\x1b[38;5;196m"; // bright red 
     constexpr const char* RESET     = "\x1b[0m";
     
-    const char get(const char* code){
+    const char* get(const char* code){
       return enabled ? code : "";
     }
 }
@@ -60,10 +60,10 @@ static void print_hex(std::span<const char> bytes, std::size_t offset) {
         const char* col = (byte == 0x00) ? color::HEX_NULL:
                           (byte >= 0x20 && byte < 0x7f) ? color::HEX_LO: color::HEX_HI;
                            
-        std::cout <<col
+        std::cout <<color::get(col)
                   <<' '
                   << std::setw(2)
-                  << static_cast<unsigned int>(byte);
+                  << static_cast<unsigned int>(byte)
                   <<color::get(color::RESET);
     }
 
