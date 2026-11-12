@@ -33,6 +33,10 @@ namespace color {
     constexpr const char* ENTROPY_MD = "\x1b[38;5;226m"; // yellow     
     constexpr const char* ENTROPY_HI = "\x1b[38;5;196m"; // bright red 
     constexpr const char* RESET     = "\x1b[0m";
+    
+    const char get(const char* code){
+      return enabled ? code : "";
+    }
 }
 
 
@@ -53,9 +57,14 @@ static void print_hex(std::span<const char> bytes, std::size_t offset) {
         }
 
         const auto byte = static_cast<unsigned char>(bytes[bytes_it]);
-        std::cout <<' '
+        const char* col = (byte == 0x00) ? color::HEX_NULL:
+                          (byte >= 0x20 && byte < 0x7f) ? color::HEX_LO: color::HEX_HI;
+                           
+        std::cout <<col
+                  <<' '
                   << std::setw(2)
                   << static_cast<unsigned int>(byte);
+                  <<color::get(color::RESET);
     }
 
     for(std::size_t padding_it = bytes.size(); padding_it < buf_size; ++padding_it){
