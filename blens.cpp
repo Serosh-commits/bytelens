@@ -13,6 +13,7 @@
 #include<unistd.h>
 #include<cstdio>
 #include<string>
+#include<utility>
 constexpr std::size_t buf_size = 16;
 constexpr std::size_t IO_BUFF = 64 * 1024;
 
@@ -48,6 +49,23 @@ struct file_reader{
         if(fd >= 0){
             ::close(fd);
         }
+    }
+    
+    file_reader(const file_reader&) = delete;
+    file_reader& operator = (const file_reader&) = delete;
+    
+    file_reader(file_reader&& other) noexcept
+        :fd(other.fd),
+         pos(other.pos),
+         size(other.size),
+         at_eof(other.at_eof),
+         buf(std::move(other.buf)),
+         buf_len(other.buf_len),
+         buf_pos(other.buf_pos)
+    {
+        other.fd = -1;
+        other.buf_len = 0;
+        other.buf_pos = 0;
     }
 
     static file_reader open(const std::string& path){
@@ -92,7 +110,6 @@ namespace color {
       return enabled ? code : "";
     }
 }
-
 
 static void print_hex(std::span<const char> bytes, std::size_t offset) {
     std::cout << std::hex
