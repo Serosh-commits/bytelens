@@ -57,6 +57,15 @@ static void print_hex(std::span<const char> bytes, std::size_t offset) {
                   << std::setw(2)
                   << static_cast<unsigned int>(byte);
     }
+
+    for(std::size_t padding_it = bytes.size(); padding_it < buf_size; ++padding_it){
+        
+        if(padding_it == buf_size / 2){
+            std::cout<< ' ';
+        }
+
+        std::cout<<"   ";
+    }
 }
 
 static void print_ascii(std::span<const char>bytes){
