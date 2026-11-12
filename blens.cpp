@@ -4,15 +4,63 @@
 #include <iomanip>
 #include <iostream>
 #include<array>
+#include<cstdint>
 #include<span>
 #include<vector>
+#include<fcntl.h>
+#include<sys/wait.h>
+#include<sys/stat.h>
+#include<unistd.h>
+#include<cstdio>
 #include<string>
 constexpr std::size_t buf_size = 16;
+constexpr std::size_t IO_BUFF = 64 * 1024;
 
 enum class colorwish{
     unset,
     on,
     off
+};
+
+struct options{
+    std::string command;
+    std::string filepath;
+    uint64_t offset = 0;
+    uint64_t limit = UINT64_MAX;
+    int width = 16;
+    int min_strlen = 4;
+    std::vector<uint8_t>raw;
+    std::string pattern_raw;
+    //kept it unset the color for now so user can choose what to select
+    colorwish color_wish = colorwish::unset;
+};
+
+struct file_reader{
+    int fd = -1;
+    uint64_t pos = 0;
+    uint64_t size = 0;
+    bool at_eof = false;
+    std::array<uint64_t, IO_BUFF>buf;
+    std::size_t buf_len = 0;
+    std::size_t buf_pos = 0;
+
+    static file_reader open(const std::string& path){
+        file_reader fr;
+        fr.fd = ::open(path.c_str(), O_RDONLY);
+
+        if(fr.fd  < 0 ){
+            std::perror("bytelens: open");
+            std::exit(EXIT_FAILURE);
+        }
+
+        struct stat st{};
+
+        if(::fstat(fr.fd, &st) == 0){
+            fr.size = static_cast<uint8_t>(st.st_size);
+        }
+
+        return fr;
+    }
 };
 
 namespace color {
@@ -39,10 +87,6 @@ namespace color {
     }
 }
 
-
-const char* get(const char* code){
-    return color::enabled ? code : "";
-}
 
 static void print_hex(std::span<const char> bytes, std::size_t offset) {
     std::cout << std::hex
