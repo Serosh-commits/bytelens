@@ -44,6 +44,12 @@ struct file_reader{
     std::size_t buf_len = 0;
     std::size_t buf_pos = 0;
 
+    ~file_reader(){
+        if(fd >= 0){
+            ::close(fd);
+        }
+    }
+
     static file_reader open(const std::string& path){
         file_reader fr;
         fr.fd = ::open(path.c_str(), O_RDONLY);
