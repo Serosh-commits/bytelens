@@ -47,18 +47,14 @@ static void print_hex(std::span<const char> bytes, std::size_t offset) {
               << offset
               << "  ";
      for(std::size_t bytes_it = 0; bytes_it < bytes.size(); ++bytes_it) {
+        
+        if(bytes_it == 8){
+            std::cout<<" ";
+        }
+
         const auto byte = static_cast<unsigned char>(bytes[bytes_it]);
-
-        std::cout<<" ";
-        if (bytes_it != 0) {
-            std::cout << ' ';
-        }
-
-        if(bytes_it  == 8){
-            std::cout<<' ';
-        }
-
-        std::cout << std::setw(2)
+        std::cout <<' '
+                  << std::setw(2)
                   << static_cast<unsigned int>(byte);
     }
 }
