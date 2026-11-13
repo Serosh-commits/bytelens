@@ -220,7 +220,11 @@ int main(int argc, char* argv[]) {
     
     std::string filepath = argv[1];
     file_reader fr = file_reader::open(filepath);
-
+    
+    if(!fr.seek(10)){
+      std::cerr<<"bytelens: unable to seek :)\n";
+      return EXIT_FAILURE;
+    }
 
     std::array<char , buf_size> buffer{};
     std::size_t offset = 0;
