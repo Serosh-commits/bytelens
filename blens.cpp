@@ -217,41 +217,27 @@ int main(int argc, char* argv[]) {
         std::cerr << "<include file>\n";
         return EXIT_FAILURE;
     }
-    std::ifstream file(argv[1], std::ios::binary);
+    
+    std::string filepath = argv[1];
+    file_reader fr = file_reader::open(filepath);
 
-    if (!file) {
-        std::cerr << "bytelens: failed to open file '"
-                  << argv[1] << "'\n";
-        return EXIT_FAILURE;
-    }
 
     std::array<char , buf_size> buffer{};
     std::size_t offset = 0;
     std::size_t total_bytes = 0;
     while (true) {
-        file.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
-        const std::streamsize bytes_read = file.gcount();
-        if (bytes_read > 0) {
-            const auto count = static_cast<std::size_t>(bytes_read);
-            print_hex(std::span<const char>(buffer.data(), count), offset);
-            print_ascii(std::span<const char>(buffer.data(), count));
-            offset += count;
-            total_bytes += count;
+      std::size_t bytes_read = fr.read(reinterpret_cast<uint8_t*>(buffer.data()), buffer.size());
+
+        if (bytes_read == 0) {
+          break;
         }
 
-        if (file.bad()) {
-            std::cerr << "bytelens: error reading file input\n";
-            return EXIT_FAILURE;
-        }
+      const auto count = static_cast<std::size_t>(bytes_read);
+      print_hex(std::span<const char>(buffer.data(), count), offset);
+      print_ascii(std::span<const char>(buffer.data(), count));
 
-        if (file.eof()) {
-            break;
-        }
-
-        if (file.fail()) {
-            std::cerr << "bytelens: error reading the file\n";
-            return EXIT_FAILURE;
-        }
+      offset += count;
+      total_bytes += count;
     }
     std::cout << std::dec
               << "total bytes read : " << total_bytes << '\n';
