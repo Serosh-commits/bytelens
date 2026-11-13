@@ -233,13 +233,33 @@ static bool is_command(std::string_view value){
 
   return false;
 }
+
+static uint64_t parse_num(const char* s,const char* flag){
+  char *end = nullptr;
+
+  uint64_t value = std::stroull(s, &end, 0);
+  if (*end == '\0')  { 
+    std::cerr<<"bytelens : invalid value for :"<<flag<<": "<<s<<"\n";
+    std::exit(EXIT_FAILURE);
+  }
+
+  return value;
+}
+
+static options parse_args(int argc, char* argv[]){
+  options opts
+
+  if (argc  < 2) {
+    std::cerr<<"Usage : bytelens [command] <include file>\n";
+    std::exit(EXIT_FAILURE);
+  }
+
+  return opts;
+}
+
 int main(int argc, char* argv[]){
-    if (argc < 2) {
-        std::cerr << "Usage : bytelens [command] <include file>\n";
-        return EXIT_FAILURE;
-    }
     
-    options opts;
+    options opts = parse_args(argc, argv);
     if (is_command(argv[1])) {
       if (argc < 3) {
         std::cerr<<"ERROR : missing file path :)\n";
