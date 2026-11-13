@@ -44,7 +44,7 @@ struct file_reader{
     uint64_t pos = 0;
     uint64_t size = 0;
     bool at_eof = false;
-    std::array<uint64_t, IO_BUFF>buf;
+    std::array<uint8_t, IO_BUFF>buf;
     std::size_t buf_len = 0;
     std::size_t buf_pos = 0;
     
@@ -106,7 +106,7 @@ struct file_reader{
     bool read_at(uint64_t off, T& out) const {
       ssize_t n = ::pread(fd,&out,sizeof(T),static_cast<off_t>(off));
 
-      return n = static_cast<ssize_t>(sizeof(T));
+      return n == static_cast<ssize_t>(sizeof(T));
     }
     bool seek(uint64_t off){
       if (::lseek(fd, static_cast<off_t>(off), SEEK_SET) == (off_t) - 1) {
@@ -132,7 +132,7 @@ struct file_reader{
         struct stat st{};
 
         if(::fstat(fr.fd, &st) == 0){
-            fr.size = static_cast<uint8_t>(st.st_size);
+            fr.size = static_cast<uint64_t>(st.st_size);
         }
 
         return fr;
@@ -233,20 +233,37 @@ static bool is_command(std::string_view value){
 
   return false;
 }
-int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        std::cerr << "<include file>\n";
+int main(int argc, char* argv[]){
+    if (argc < 2) {
+        std::cerr << "Usage : bytelens [command] <include file>\n";
         return EXIT_FAILURE;
     }
     
-    std::string filepath = argv[1];
-    file_reader fr = file_reader::open(filepath);
-   // 10 = temp 
-    if(!fr.seek(10)){
-      std::cerr<<"bytelens: unable to seek :)\n";
-      return EXIT_FAILURE;
-    }
+    options opts;
+    if (is_command(argv[1])) {
+      if (argc < 3) {
+        std::cerr<<"ERROR : missing file path :)\n";
+        return EXIT_FAILURE;
+      }
 
+      opts.command = argv[1];
+      opts.filepath = argv[2];
+    } else {
+      opts.command = "hex";
+      opts.filepath = argv[1];
+    }
+    
+    file_reader fr = file_reader::open(opts.filepath);
+
+    if (opts.offset > 0) {
+      if (opts.offset >= fr.size) {
+        std::cerr<<"offset is outside of the file\n";
+        return EXIT_FAILURE;
+      }
+
+      fr.seek(opts.offset);
+    }
+    
     std::array<char , buf_size> buffer{};
     std::size_t offset = 0;
     std::size_t total_bytes = 0;
