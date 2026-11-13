@@ -14,6 +14,8 @@
 #include<cstdio>
 #include<string>
 #include<utility>
+#include<algorithm>
+#include<cstring>
 constexpr std::size_t buf_size = 16;
 constexpr std::size_t IO_BUFF = 64 * 1024;
 
@@ -44,7 +46,8 @@ struct file_reader{
     std::array<uint64_t, IO_BUFF>buf;
     std::size_t buf_len = 0;
     std::size_t buf_pos = 0;
-
+    
+    file_reader() = default;
     ~file_reader(){
         if(fd >= 0){
             ::close(fd);
@@ -67,7 +70,36 @@ struct file_reader{
         other.buf_len = 0;
         other.buf_pos = 0;
     }
+    //reading bytes into the buffer 
+    std::size_t read(uint8_t* out , std::size_t max){
+      std::size_t total = 0;
 
+      while(total < max && !at_eof){
+
+        if (buf_pos >= buf_len) {
+          ssize_t n = ::read(fd, buf.data(), IO_BUFF);
+
+          if (n <= 0) {
+            at_eof = true;
+            break;
+          }
+
+          buf_len = static_cast<std::size_t>(n);
+          buf_pos = 0;
+        }
+
+        std::size_t available = buf_len - buf_pos;
+        //give the user only the number he wants so use std::min
+        std::size_t take = std::min(available, max - total);
+        std::memcpy(out + total, buf.data() + buf_pos, take);
+        
+        buf_pos = buf_pos + take;
+        pos = pos + take;
+        total = total + take;
+      }
+
+      return total;
+    }
     static file_reader open(const std::string& path){
         file_reader fr;
         fr.fd = ::open(path.c_str(), O_RDONLY);
