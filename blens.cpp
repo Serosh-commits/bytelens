@@ -15,6 +15,7 @@
 #include<string>
 #include<utility>
 #include<algorithm>
+#include<string_view>
 #include<cstring>
 constexpr std::size_t buf_size = 16;
 constexpr std::size_t IO_BUFF = 64 * 1024;
@@ -212,6 +213,26 @@ static void print_ascii(std::span<const char>bytes){
     std::cout<<"|  \n";
 
 }
+
+static bool is_command(std::string_view value){
+  static constexpr std::string_view commands[] = {
+    "hex",
+    "strings",
+    "info",
+    "headers",
+    "entropy",
+    "search"
+  };
+
+  for (std::string_view cmd : commands) {
+    
+    if (value == cmd) {
+      return true;
+    }
+  }
+
+  return false;
+}
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         std::cerr << "<include file>\n";
@@ -220,7 +241,7 @@ int main(int argc, char* argv[]) {
     
     std::string filepath = argv[1];
     file_reader fr = file_reader::open(filepath);
-    
+   // 10 = temp 
     if(!fr.seek(10)){
       std::cerr<<"bytelens: unable to seek :)\n";
       return EXIT_FAILURE;
