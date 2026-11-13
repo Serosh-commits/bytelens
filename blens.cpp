@@ -100,6 +100,25 @@ struct file_reader{
 
       return total;
     }
+
+    template<typename T>
+    bool read_at(uint64_t off, T& out) const {
+      ssize_t n = ::pread(fd,&out,sizeof(T),static_cast<off_t>(off));
+
+      return n = static_cast<ssize_t>(sizeof(T));
+    }
+    bool seek(uint64_t off){
+      if (::lseek(fd, static_cast<off_t>(off), SEEK_SET) == (off_t) - 1) {
+        return false;
+      }
+
+      pos = off;
+      buf_len = 0;
+      buf_pos = 0;
+      at_eof = false;
+
+      return true;
+    }
     static file_reader open(const std::string& path){
         file_reader fr;
         fr.fd = ::open(path.c_str(), O_RDONLY);
